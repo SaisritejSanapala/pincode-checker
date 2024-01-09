@@ -55,41 +55,41 @@ const data = {
 }
 
 class PincodeChecker extends HTMLElement {
-    connectedCallback() {
-        this.innerHTML = `
-            <form id="pincodeForm">
-                <label for="pincode">Enter Pincode:</label>
-                <input type="number" id="pincode" name="pincode" required>
-                <button type="button" onclick="checkPincode()">Check Pincode</button>
-            </form>
-            <div > <p id="result"></p></div>
-        `;
+    constructor() {
+        super();
+        this.pincode = this.querySelector('input');
+        this.result = this.querySelector('#result');
+        this.button = this.querySelector('button');
+
+        this.button.addEventListener("click", this.checkPincode.bind(this))
+
+
     }
-}
 
-// Define the checkPincode function
-function checkPincode() {
-    let result = document.getElementById("result");
-    let pincode = document.getElementById('pincode').value;
-
-    if (pincode.length !== 6) {
-        result.innerText = "Pincode should be 6 digits";
-    } else {
-        const details = data.deliveryLocations.filter((each) => each.pincode === pincode);
-
-        if (details.length > 0) {
-            const estimatedDeliveryDays = details[0].estimatedDeliveryDays;
-            const currentDate = new Date();
-            const deliveryDate = new Date(currentDate.setDate(currentDate.getDate() + estimatedDeliveryDays));
-
-            result.innerText = `Estimated Delivery Days: ${estimatedDeliveryDays}, Delivery Date: ${deliveryDate.toDateString()}`;
+    checkPincode() {
+       
+        if (this.pincode.value.length !== 6) {
+            this.result.textContent = "Pincode should be 6 digits";
         } else {
-            result.innerText = "Enter a valid pincode";
+            const details = data.deliveryLocations.filter((each) => each.pincode === this.pincode.value);
+
+            if (details.length > 0) {
+                const estimatedDeliveryDays = details[0].estimatedDeliveryDays;
+                const currentDate = new Date();
+                const deliveryDate = new Date(currentDate.setDate(currentDate.getDate() + estimatedDeliveryDays));
+
+                this.result.textContent = `Estimated Delivery Days: ${estimatedDeliveryDays}, Delivery Date: ${deliveryDate.toDateString()}`;
+            } else {
+                this.result.textContent = "Enter a valid pincode";
+            }
         }
+
+        this.pincode.value = ""
     }
 
-    document.getElementById('pincode').value = ""
+
 }
+
 
 // Register the PincodeChecker custom element
 customElements.define('pincode-checker', PincodeChecker);
